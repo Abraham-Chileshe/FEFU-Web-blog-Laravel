@@ -1,0 +1,33 @@
+@font-face{
+    src: url('../font/header.ttf');
+    font-family: "myfont";
+}
+@font-face{
+    src: url('../font/blackjack.otf');
+    font-family: "black";
+}
+.carousel-caption{
+    margin-top:-10em;
+    margin-bottom:10em;
+}
+.login_btn{
+   padding:15px 19px;
+}
+.black-bg{
+    background-color:rgb(36,30,37);
+}
+h2{
+    font-family: "myfont";
+    font-size:36px;
+}
+h3{
+    font-family: "black";
+    color:rgb(82, 82, 82);
+}
+footer{
+    background-color:rgb(36,30,37);
+}
+.scrollable-block{
+    overflow-y:scroll;
+    height:400px;
+}
