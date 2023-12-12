@@ -21,11 +21,10 @@ class SessionsController extends Controller
         
         return redirect()->to('/home');
     }
-    
-    public function destroy()
-    {
+
+    public function destroy() {
         auth()->logout();
-        
         return redirect()->to('/login');
+    } // Destroy the user session  // Redirect to the login page
+
     }
-}
