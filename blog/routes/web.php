@@ -12,15 +12,9 @@
 */
 
 Route::get('/', function () {
-    return view('registration');
-});
-Route::get('/home', function () {
     return view('blog.home');
 });
 
-Route::get('/login', function () {
-    return view('login');
-});
 
 
 //Registration
@@ -37,6 +31,5 @@ Route::get('lang-update', 'DML@lang_update');
 
 Route::get('add-post', 'AddPost@postinsert');
 Route::post('add-post','AddPost@postinsert');
-
 
 Route::get('home', 'AddPost@viewpost');
