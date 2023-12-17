@@ -21,9 +21,12 @@ class RegistrationController extends Controller
         $pwd = $request->input('password');
         $vk = "https://vk.com/";
         $lang = "en";
+        $new = "1";
+        $join = now();
+        $date =  $join->toDateTimeString();
 
         $pwd = bcrypt($pwd);
-        $data=array('name'=>$username,"email"=>$email,"gender"=>$gender,"dob"=>$dob, "password"=>$pwd, "lang"=>$lang, "vk"=>$vk);
+        $data=array('name'=>$username,"email"=>$email,"gender"=>$gender,"dob"=>$dob, "password"=>$pwd, "lang"=>$lang, "vk"=>$vk, "created_at"=>$date, "new_acc"=>$new);
         DB::table('users')->insert($data);
 
         $user = DB::table('users')->where('email', $email)->first();
