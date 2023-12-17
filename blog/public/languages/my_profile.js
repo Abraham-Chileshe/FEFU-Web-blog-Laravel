@@ -2,13 +2,29 @@ var dictionary = {
     "ru": { // when language is not supported
         "logout": "Выход",
         "home": "Главный",
-        "create": "создать новую запись"
+        "create": "создать новую запись",
+        "joined" : "Cоздано",
+        "VK": "ссылка на вк",
+        "dob": "д.рождения: ",
+        "gender": "Пол :",
+        "post_title": "заглавие",
+        "post_desc" : "описание",
+        "msg" : "добавить новый пост ",
+        "like" : "Лайк"
 
     },
     "en": {
         "logout": "logout",
         "home": "Home",
-        "create": "Create new Post"
+        "create": "Create new Post",
+        "joined": "Joined",
+        "VK": "Vk link",
+        "dob": "DoB : ",
+        "gender" : "Gender :",
+        "post_title": "Title",
+        "post_desc" : "Description",
+        "msg" : "Add New Post",
+        "like" : "Like"
     }
 }
 
