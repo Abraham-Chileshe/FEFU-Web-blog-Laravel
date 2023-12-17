@@ -1,62 +1,106 @@
 @font-face{
-    src: url('../font/header.ttf');
+    src: url('../fonts/header.ttf');
     font-family: "myfont";
 }
 @font-face{
-    src: url('../font/blackjack.otf');
+    src: url('../fonts/blackjack.otf');
     font-family: "black";
 }
-.carousel-caption{
-    margin-top:-10em;
-    margin-bottom:10em;
+:root{
+    --blue:  #05386B;
+    --blue-green: rgba(55, 150, 131, 0.29);
+    --green: #5CDB95;
+    --light-green: rgba(92, 219, 149, 0.35);
+    --light-blue: rgba(0, 67, 136, 0.19);
 }
-.login_btn{
-   padding:15px 19px;
-}
-.black-bg{
-    background-color:rgb(36,30,37);
-}
-h2{
-    font-family: "myfont";
-    font-size:36px;
-}
-h3{
-    font-family: "black";
-    color:rgb(82, 82, 82);
-}
-footer{
-    background-color:rgb(36,30,37);
-}
-.scrollable-block{
-    overflow-y:scroll;
-    height:400px;
-}
+body{
 
-
-
-/* Header/Blog Title */
-.header {
-    padding: 30px;
-    font-size: 40px;
-    text-align: center;
-    background: white;
 }
-
-
-/* Fake image */
-.fakeimg {
-    background-color: #aaa;
+.container-custom{
     width: 100%;
-    padding: 20px;
+    padding-right: 4em;
+    padding-left: 4em;
+    margin-right: auto;
+    margin-left: auto;
+}
+.navbar{
+    background-color:var(--blue);
+}
+.breadcrumb{
+    background-color: var(--light-blue);
+    border-right:5px solid var(--green);
+
+}
+.navbar input{
+    background-color: whitesmoke
+}
+.navbar button{
+    background-color: var(--green);
+    color:white;
+}
+.post{
+    padding:1em;
+}
+.main-card{
+    border-color: var(--light-blue);
+    margin-right:0.5em;
+}
+.main-card a:hover{
+    color: var(--green);
+    text-decoration:none;
+}
+.main-card h6{
+    color: grey;
+    font-size:14px;
+    margin-top:6px;
+}
+.carousel-item img{
+    border:4px dashed var(--green);
+}
+.like-btn{
+    background-color:var(--light-green);
+    border-radius:100px;
+}
+.fakeimg{
+    background-image: url('https://thumbs.dreamstime.com/b/cup-hot-arabic-coffee-coffee-beans-nice-pic-cup-hot-arabic-coffee-coffee-beans-nice-pic-291127956.jpg');
+    background-size:cover;
+}
+.card-header{
+    background-color:var(--blue-green);
+}
+.card-header button{
+  color:var(--blue);
+    text-transform: uppercase;
+}
+.card-body a{
+    text-decoration:none;
+    color:var(--blue);
 }
 
-/* Add a card effect for articles */
-.card {
-    background-color: white;
-    padding: 20px;
-    margin-top: 20px;
+/* SCROLLBAR CODE FOR DIV */
+.scroll-container {
+    height: 1500px;
+    overflow-y: scroll;
 }
 
+.scroll-container::-webkit-scrollbar {
+    width: 3px;
+}
 
+.scroll-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
 
+.scroll-container::-webkit-scrollbar-thumb {
+    background: var(--blue-green);
+}
 
+.scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.scroll-container::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* SCROLLBAR CODE FOR DIV */
