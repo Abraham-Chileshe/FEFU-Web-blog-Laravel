@@ -37,7 +37,7 @@
             <div class="w3l-form-info">
                 <div class="w3_info">
                     <h2>зарегистрировать</h2>
-                    <form action="{{ url('add-user') }}"  method="post">
+                    <form action="{{ url('add-user') }}" id="subm"  method="post">
                         {{ csrf_field() }}
                         <div class="input-group">
                             <span><i class="fas fa-user" aria-hidden="true"></i></span>
