@@ -17,6 +17,9 @@ class DML extends Controller
         $data=array('lang'=>$lang);
         DB::table('users')->where('id', auth()->user()->id)->update($data);
 
-        return redirect()->to('/home');
+        return redirect()->to('/');
     }
+
+    
+  
 }
