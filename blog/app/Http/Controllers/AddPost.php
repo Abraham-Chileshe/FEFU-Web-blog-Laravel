@@ -15,24 +15,36 @@ class AddPost extends Controller
         $user_id = auth()->user()->id;
         $title = $request->input('title');
         $desc= $request->input('description');
+        $path = "";
 
-        $data=array('user_id'=>$user_id, 'title'=>$title,"description"=>$desc, "date"=>$date);
-        DB::table('posts')->insert($data);
+        $file = $request->file('photo');
+        // Check if a file was uploaded
+        if ($file) {
+            // Ensure the 'uploads/students/' directory exists
+            $uploadPath = 'uploads/';
+            $extension = $file->getClientOriginalExtension();
+            $filename = time() . '.' . $extension;
 
-        return redirect()->to('/home');
+            // Move the file to the specified directory
+            $file->move($uploadPath, $filename);
+
+            $data=array('user_id'=>$user_id, 'title'=>$title, 'path'=>$uploadPath.$filename, "description"=>$desc, "date"=>$date);
+            DB::table('posts')->insert($data);
+        }else{
+
+            $data=array('user_id'=>$user_id, 'title'=>$title, 'path'=>$path, "description"=>$desc, "date"=>$date);
+            DB::table('posts')->insert($data);
+        }
+
+    
+        
+
+       
+
+        return redirect()->to('/');
+      
 
     }
 
-
-
-    public function viewpost()
-    {
-        $posts = DB::table('posts')
-            ->join('users', 'posts.user_id', '=', 'users.id')
-            ->select('posts.*', 'users.name')
-            ->orderBy('posts.id', 'desc')
-            ->get();
-
-        return view('blog.home', ['posts' => $posts]);
-    }
+  
 }
