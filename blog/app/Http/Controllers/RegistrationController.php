@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use App\User;
 use DB;
@@ -18,21 +19,46 @@ class RegistrationController extends Controller
         $email = $request->input('email');
         $gender = $request->input('gender');
         $dob = $request->input('dob');
-        $pwd = $request->input('password');
+        $password = $request->input('password');
         $vk = "https://vk.com/";
         $lang = "en";
         $new = "1";
         $join = now();
-        $date =  $join->toDateTimeString();
+        $date = $join->toDateTimeString();
+        
+    
+        $password = bcrypt($password);
+    
+        $data = array(
+            'username' => $username,
+            'email' => $email,
+            'gender' => $gender,
+            'dob' => $dob,
+            'password' => $password,
+            'lang' => $lang,
+            'vk' => $vk,
+            'created_at' => $date,
+            'new_acc' => $new
+        );
+    
+        try {
+            // Insert the user into the database
+            DB::table('users')->insert($data);
+    
+            // Authenticate the user after registration
+            $user = DB::table('users')->where('email', $email)->first();
+            auth()->loginUsingId($user->id);
+    
+            // Redirect to the home view or any other desired page
+            return redirect()->to('/');
 
-        $pwd = bcrypt($pwd);
-        $data=array('name'=>$username,"email"=>$email,"gender"=>$gender,"dob"=>$dob, "password"=>$pwd, "lang"=>$lang, "vk"=>$vk, "created_at"=>$date, "new_acc"=>$new);
-        DB::table('users')->insert($data);
-
-        $user = DB::table('users')->where('email', $email)->first();
-
-        auth()->loginUsingId($user->id);
-
-        return redirect()->to('/home');
+        } catch (\Illuminate\Database\QueryException $e) {
+            $errorCode = $e->errorInfo[1];
+    
+            if ($errorCode == '1062') {
+                $duplicateEmail_error = "Failed. The email address you used already exists in the database";
+                return redirect('/')->withErrors(['error' => $duplicateEmail_error]);
+            }
+        }
     }
 }
