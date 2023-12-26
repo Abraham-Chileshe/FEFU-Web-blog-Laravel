@@ -10,11 +10,20 @@ $photos = DB::table('posts')
         ->get();
 @endphp
 
+
 {{-- This sets the language of the page--}}
 @if( auth()->check() )
     @php
     $lang =  auth()->user()->lang 
     @endphp
+
+    @php
+        $agree = DB::table('users')
+        ->select('users.*')
+        ->where('id', auth()->user()->id)
+        ->first();
+    @endphp
+     
 
 @else
     @php 
@@ -29,6 +38,12 @@ $photos = DB::table('posts')
 
     <!-- Header -->
     @include('blog/inc/navbar');
+    @if( auth()->check() )
+        @if($agree->new_acc == 1)
+            @include('blog/inc/agreement');
+        @endif
+    @endif
+   
     <!-- Header -->
 
 
@@ -169,38 +184,32 @@ $photos = DB::table('posts')
                                 @endphp
 
                                 @if( auth()->check() )
-                                    <!-- Update the like button link -->
-
-                                <div class="form-group" >
-                                    <span class="update_like{{$post->pid}}">
-                                    <a href="#" class="btn like-btn" id="like_{{ $post->pid }}" style="min-width:70px">
-                                        <i class="mr-1 fa fa-heart"></i> {{ $num_likes }}
-                                    </a>
-
-                                    <a href="#" class="btn comment-btn"  id="comment_count_{{ $post->pid }}" style="min-width:70px">
-                                        <i class="mr-1 fa fa-comment"></i>  {{ $num_comments }}
-                                    </a>
-
-                                    <a href="{{url('/post')}}?postid={{ $post->pid}}" class="btn float-right read-btn" style="min-width:70px">
-                                        <i class="mr-1 fa fa-eye"></i> Read More
-                                    </a>
-                                </span>
-                                  
-
-                                    <hr/>
-                                   
-                                    <form method="post" class="comment_form" id="comment_{{ $post->pid }}">
-                                        <input type="text" class="form-control" placeholder="Comment" />
-                                        <input type="submit" class="btn btn-info mt-2" value="submit" />
-                                    </form>
-                                </div>
+                                    {{--Like, coomment and read more button when logged in--}}
+                                    <div class="form-group" >
+                                        <span class="update_like{{$post->pid}}">
+                                            <a href="#" class="btn like-btn" id="like_{{ $post->pid }}" style="min-width:70px"><i class="mr-1 fa fa-heart"></i> {{ $num_likes }}</a>
+                                            <a href="#" class="btn comment-btn"  id="comment_count_{{ $post->pid }}" style="min-width:70px"><i class="mr-1 fa fa-comment"></i>  {{ $num_comments }}</a>
+                                            <a href="{{url('/post')}}?postid={{ $post->pid}}" class="btn float-right read-btn" style="min-width:70px"><i class="mr-1 fa fa-eye"></i> Read More</a>
+                                        </span><hr/>
+                                    
+                                        <form method="post" class="comment_form" id="comment_{{ $post->pid }}">
+                                            <input type="text" class="form-control" placeholder="Comment" />
+                                            <input type="submit" class="btn btn-info mt-2" value="submit" />
+                                        </form>
+                                    </div>
+                                    {{--Like, coomment and read more button when logged in--}}
                                 
                                 @else
-                                <a class="btn"  style="background-color: var(--blue-green); min-width:70px">
-                                     <i class="ml-2 fa fa-heart"></i> {{ $num_likes }}
-                                </a>
+                                    {{--Like, coomment and read more button when NOT logged in--}}
+                                    <div>
+                                        <a class="btn"  style="background-color: var(--blue-green); min-width:70px"><i class="ml-2 fa fa-heart"></i> {{ $num_likes }}</a>
+                                        <a class="btn"  style="background-color: var(--blue-green); min-width:70px"><i class="ml-2 fa fa-comment"></i> {{ $num_comments }}</a>
+                                        <a href="{{url('/post')}}?postid={{ $post->pid}}" class="btn float-right read-btn" style="min-width:70px"><i class="mr-1 fa fa-eye"></i> Read More</a>
+                                    </div>
+                                     {{--Like, coomment and read more button when NOT logged in--}}
 
                                 @endif
+
 
                                 {{-- This update the like and Comment button very second--}}
                                 <script>
@@ -312,7 +321,7 @@ $photos = DB::table('posts')
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="recipient-name" class="col-form-label"> <localized-text key="post_title" lang="@php echo $lang @endphp"></localized-text></label>
+                                    <label for="recipient-name" class="col-form-label"> <localized-text key="post_image" lang="@php echo $lang @endphp"></localized-text></label>
                                     <input type="file" class="form-control" name="photo">
                                 </div>
 
@@ -323,8 +332,8 @@ $photos = DB::table('posts')
 
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Send message</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal"><localized-text key="p_close" lang="@php echo $lang @endphp"></localized-text></button>
+                            <button type="submit" class="btn btn-primary"><localized-text key="p_create" lang="@php echo $lang @endphp"></localized-text></button>
                         </div>
                         </form>
                     </div>
@@ -349,32 +358,28 @@ $photos = DB::table('posts')
                                     <form action="{{ url('add-user') }}" id="subm"  method="post">
                                         {{ csrf_field() }}
                                         <div class="input-group">
-                                            <span><i class="fas fa-user" aria-hidden="true"></i></span>
-                                            <input type="text" placeholder="Имя пользователя" name="username" required="">
+                                            <input type="text" placeholder="Имя пользователя" class="mt-3 form-control" name="username" required="">
                                         </div>
 
                                         <div class="input-group">
-                                            <span><i class="fas fa-envelope" aria-hidden="true"></i></span>
-                                            <input type="email" placeholder="почты" name="email" required="">
+                                            <input type="email" class="mt-3 form-control" placeholder="почты" name="email" required="">
                                         </div>
 
                                         <div class="input-group">
-                                            <span><i class="fas fa-key" aria-hidden="true"></i></span>
-                                            <select name="gender">
+                                           
+                                            <select name="gender" class="mt-3 form-control">
                                                 <option value="Male">Male</option>
                                                 <option value="Female">Female</option>
 
                                             </select>
                                         </div>
 
-                                        <div class="input-group">
-                                            <span><i class="fas fa-calendar" aria-hidden="true"></i></span>
-                                            <input type="date" required="" name="dob">
+                                        <div class="input-group">                                   
+                                            <input type="date"class="mt-3 form-control" required="" name="dob">
                                         </div>
 
-                                        <div class="input-group">
-                                            <span><i class="fas fa-key" aria-hidden="true"></i></span>
-                                            <input type="Password"  id="myInput" placeholder="пароль" name="password" required="">
+                                        <div class="input-group"> 
+                                            <input type="Password"  id="myInput" class="mt-3 form-control" placeholder="пароль" name="password" required="">
                                         </div>
                                         <br/>
 
@@ -384,8 +389,8 @@ $photos = DB::table('posts')
                                                 <label> показать пароль</label>
                                             </div>
                                         </div>
-                                        <button class="btn btn-primary btn-block" type="submit">вход</button><br/>
-                                        <center><a class="mt-2" href="{{ url('login')}}">у вас уже ест? Войдите здесь</a></center>
+                                        <button class="btn btn-primary btn-block" type="submit">Register</button><br/>
+                                
                                     </form>
                                 </div>
 
@@ -397,7 +402,7 @@ $photos = DB::table('posts')
 
     </div>
 
-                @include('blog/inc/errors');
+                @include('blog/inc/errors')
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
