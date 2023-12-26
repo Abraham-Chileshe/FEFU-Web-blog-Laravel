@@ -1,44 +1,34 @@
 @extends('blog.inc.layout')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous" ></script>
+
+
+@php
+
+$photos = DB::table('posts')
+        ->select('posts.*', 'posts.path as img_path')
+        ->orderBy('posts.id', 'desc')
+        ->get();
+@endphp
+
+{{-- This sets the language of the page--}}
+@if( auth()->check() )
+    @php
+    $lang =  auth()->user()->lang 
+    @endphp
+
+@else
+    @php 
+        $lang = "en";
+    @endphp
+
+@endif
+{{-- This sets the language of the page--}}
+
 
 @section('content')
 
     <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="#">Blog</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="text" placeholder="Username" aria-label="Search">
-                <input class="form-control mr-sm-2" type="password" placeholder="Password" aria-label="Search">
-                <button class="btn my-2 my-sm-0" type="submit">Login</button>
-            </form>
-        </div>
-    </nav>
+    @include('blog/inc/navbar');
     <!-- Header -->
 
 
@@ -55,18 +45,40 @@
                         <div class="card-header" id="headingOne">
                             <h5 class="mb-0">
                                 <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    New Users
+                                    <localized-text key="new_users" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
+                
                                 </button>
                             </h5>
                         </div>
                         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
                             <div class="card-body">
-                                @for ($i = 1; $i <5; $i++)
+                            
+
+                             
+                                @if( auth()->check() )
+                                    @php
+                                    $users = DB::table('users')
+                                    ->select('users.*')
+                                    ->where('id', '!=', auth()->user()->id)
+                                    ->orderBy('users.id', 'desc')
+                                    ->get();
+                                    @endphp
+                                @else
+                                    @php
+                                    $users = DB::table('users')
+                                    ->select('users.*')
+                                    ->orderBy('users.id', 'desc')
+                                    ->get();
+                                    @endphp
+                                @endif
+                            
+        
+                            @foreach ($users as $user_all)
                                     <div>
-                                     <a href="">{{ $i  }}. Abraham Chileshe</a>
+                                     <a href=""><i class="fa fa-user-circle mr-2" ></i> {{ $user_all->username  }}</a>
                                         <hr />
                                     </div>
-                                @endfor
+                            @endforeach
                             </div>
                         </div>
                     </div>
@@ -88,26 +100,7 @@
                     <!-- Repeat the structure for additional accordion items -->
                 </div>
 
-                <div class="card post mt-4">
-                    <h3>Registration</h3>
-                <form>
-                    <div class="mb-3">
-                        <input type="email" placeholder="Enter Email Address" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                    </div>
-                    <div class="mb-3">
-                        <input type="text" placeholder="Enter username" class="form-control" id="exampleInputPassword1">
-                    </div>
-                    <div class="mb-3">
-
-                        <input type="password" placeholder="Enter Password" class="form-control" id="exampleInputPassword1">
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                        <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-                </div>
+                
 
             </div>
             <!-- Left Column -->
@@ -127,39 +120,123 @@
 
 
                 <div class="scroll-container" >
+                    @php
+                        $posts = DB::table('posts')
+                        ->join('users', 'posts.user_id', '=', 'users.id')
+                        ->select('posts.*', 'users.username', 'users.id as uid','posts.id as pid')
+                        ->orderBy('posts.id', 'desc')
+                        ->get();
+                       
+                    @endphp
 
-                    @for ($i = 1; $i <8; $i++)
-                    <div class="mt-3 card main-card">
-                        <div class="post">
-                            <a href="">Abraham Chileshe</a>
-                            <h6>Today: 05/10/2023</h6>
-                            <div class="fakeimg rounded" style="height:200px;">Image</div>
-                            <h5 class="mt-4 mb-2">Woman who threw bowl of food at Chipotle worker sentenced to work 2 months in fast food job </h5>
-
-                            <p>{{ Illuminate\Support\Str::limit('New York
-                                CNN
-                                —
-                                A woman who threw a bowl of hot food in the face of a Chipotle worker has been sentenced to a month in jail — and two months working a fast food job.
-
-                                Videos of the woman, Rosemary Hayne, berating Chipotle worker Emily Russell on September 5 and then throwing the food in her face at close range, went viral after the incident. Hayne, a 39-year old mother of four, pleaded guilty to a misdemeanor assault charge and received the sentence last week in the Parma, Ohio, municipal court. Judge Timothy Gilligan gave her the choice of a 90-day jail sentence or a 30-day sentence on top of 60 days working in a fast food job.
-
-                                Do you want to walk in her shoes for two months and learn how people should treat people, or do you want to do your jail time?” Gilligan asked Hayne at the hearing.', 500) }}
-                                </p>
-
-                                <a href="#" target="_blank" class="btn like-btn " style="width:200px">
-                                    <i class="fa fa-thumbs-up"></i> Likes
-                                </a>
-
-                                <a href="#" target="_blank" class="btn like-btn " style="float:right; width:200px">
-                                    <i class="fa fa-comment"></i> Likes
-                                </a>
-
+                    @if ($posts->isEmpty()) 
+                        <div class="container plates" style="margin-top:-em; max-width:700px">
+                        <h5 style="margin-top:4em; line-height:22px; font-family:Arial,Helvetica,sans-serif; padding:5em; color: grey; text-align: center;">Мероприятия не Посты</h5>
+                        <h1 style="margin-top:-1em; color:white; background-color: rgba(146,0,0,0.5); text-align: center;" class="rounded"><i class="fa fa-exclamation-triangle" style="margin: 0 auto;"></i></h1><br/>
                         </div>
 
-                    </div>
-                    @endfor
+                    @endif
+                        @foreach ($posts as $post)
+                   
+                        <div class="mt-3 card main-card">
+                            <a href="#" >
+                            <div class="post">
+                                @if( auth()->check() )
+                                    @if ($post->uid == auth()->user()->id)
+                                    <a href="" style="text-transform: capitalize"> <localized-text key="you" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
+                                    </a>
+                                    @else
+                                    <a href="" style="text-transform: capitalize">{{$post->username}}<span class="sr-only">(current)</span>
+                                    </a>
+                              
+                                    @endif
+                                @else
+                                    <a href="" style="text-transform: capitalize">{{$post->username}}<span class="sr-only">(current)</span>
+                                    </a>
+                              
+                                @endif
+
+                                <h6>Today: {{ $post->date}} </h6>
+                                <div class="fakeimg rounded" style="background-image: url('{{ $post->path}}'); background-size:cover; height:200px;">Image</div>
+                                <h5 class="mt-4 mb-2">{{ $post->title}}</h5>
+
+                                <p>{{ Illuminate\Support\Str::limit($post->description, 400) }}
+                                </p>
+
+                                @php
+                                    $num_likes = DB::table('likes')->where('post_id', $post->pid)->count();
+                                    $num_comments = DB::table('comments')->where('post_id', $post->pid)->count();
+                                @endphp
+
+                                @if( auth()->check() )
+                                    <!-- Update the like button link -->
+
+                                <div class="form-group" >
+                                    <span class="update_like{{$post->pid}}">
+                                    <a href="#" class="btn like-btn" id="like_{{ $post->pid }}" style="min-width:70px">
+                                        <i class="mr-1 fa fa-heart"></i> {{ $num_likes }}
+                                    </a>
+
+                                    <a href="#" class="btn comment-btn"  id="comment_count_{{ $post->pid }}" style="min-width:70px">
+                                        <i class="mr-1 fa fa-comment"></i>  {{ $num_comments }}
+                                    </a>
+
+                                    <a href="{{url('/post')}}?postid={{ $post->pid}}" class="btn float-right read-btn" style="min-width:70px">
+                                        <i class="mr-1 fa fa-eye"></i> Read More
+                                    </a>
+                                </span>
+                                  
+
+                                    <hr/>
+                                   
+                                    <form method="post" class="comment_form" id="comment_{{ $post->pid }}">
+                                        <input type="text" class="form-control" placeholder="Comment" />
+                                        <input type="submit" class="btn btn-info mt-2" value="submit" />
+                                    </form>
+                                </div>
+                                
+                                @else
+                                <a class="btn"  style="background-color: var(--blue-green); min-width:70px">
+                                     <i class="ml-2 fa fa-heart"></i> {{ $num_likes }}
+                                </a>
+
+                                @endif
+
+                                {{-- This update the like and Comment button very second--}}
+                                <script>
+                                    $(document).ready(function () {
+                                        // Reload the div content every 5 seconds
+                                        setInterval(function () {
+                                            var update = $(this).attr('id')
+                                            // Replace '#yourDivId' with the actual ID of the div you want to reload
+                                            $('#'+update).load(location.href + '#'+update);
+
+                                        }, 1000); // 5000 milliseconds = 5 seconds
+                                    });
+                                    </script>
+                                    {{-- This update the like and Comment button very second--}}
+
+                                                                                                
+
+                                
+
+                            </div>
+                            
+                        </div>
+                   
+                        @endforeach
+                        
+                   
                 </div>
+                @include('blog/js_inc/scripts');
             </div>
+
+            
+
+            
+
+
+        
 
 
             <!--
@@ -185,17 +262,16 @@
                 <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner">
                         <div class="carousel-item active">
-                            <img src="https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg" class="d-block w-100" alt="Slide 1">
+                            <img src="https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg" class="d-block w-100" alt="Slide 1" style="height:220px;">
 
                         </div>
+
+                        @foreach ($photos as $photo)
                         <div class="carousel-item">
-                            <img src="https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg" class="d-block w-100" alt="Slide 1">
-
+                            <div class="fakeimg rounded" style="background-image: url('{{$photo->img_path}}'); background-size:cover; height:220px; border:5px dashed black"></div>
                         </div>
-                        <div class="carousel-item">
-                            <img src="https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg" class="d-block w-100" alt="Slide 1">
-
-                        </div>
+                        @endforeach
+                        
                     </div>
                     <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -208,13 +284,120 @@
                 </div>
 
 
+                
+            @if( auth()->check() )
+
+            <button type="button" class="mt-3 w-100 btn btn-primary" data-toggle="modal" data-target="#post">
+                <i class="fa fa-plus"></i>
+                <localized-text key="create" lang="@php echo $lang @endphp"></localized-text>
+            </button>
+
+            <div class="modal fade" id="post" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel"> <localized-text key="msg" lang="@php echo $lang @endphp"></localized-text></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form action="{{ url('add-post') }}" method="post" enctype="multipart/form-data">
+                            {{ csrf_field() }}
+                                <div class="modal-body">
+
+                                <div class="form-group">
+                                    <label for="recipient-name" class="col-form-label"> <localized-text key="post_title" lang="@php echo $lang @endphp"></localized-text></label>
+                                    <input type="text" class="form-control mr-sm-2" name="title">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="recipient-name" class="col-form-label"> <localized-text key="post_title" lang="@php echo $lang @endphp"></localized-text></label>
+                                    <input type="file" class="form-control" name="photo">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="message-text"  class="col-form-label"><localized-text key="post_desc" lang="@php echo $lang @endphp"></localized-text></label>
+                                    <textarea class="form-control" name="description"></textarea>
+                                </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Send message</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
 
-        </div>
+            @else
+                <button type="button" class="btn register_btn" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Registration</button>
+
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Registration</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container">
+                                    <form action="{{ url('add-user') }}" id="subm"  method="post">
+                                        {{ csrf_field() }}
+                                        <div class="input-group">
+                                            <span><i class="fas fa-user" aria-hidden="true"></i></span>
+                                            <input type="text" placeholder="Имя пользователя" name="username" required="">
+                                        </div>
+
+                                        <div class="input-group">
+                                            <span><i class="fas fa-envelope" aria-hidden="true"></i></span>
+                                            <input type="email" placeholder="почты" name="email" required="">
+                                        </div>
+
+                                        <div class="input-group">
+                                            <span><i class="fas fa-key" aria-hidden="true"></i></span>
+                                            <select name="gender">
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+
+                                            </select>
+                                        </div>
+
+                                        <div class="input-group">
+                                            <span><i class="fas fa-calendar" aria-hidden="true"></i></span>
+                                            <input type="date" required="" name="dob">
+                                        </div>
+
+                                        <div class="input-group">
+                                            <span><i class="fas fa-key" aria-hidden="true"></i></span>
+                                            <input type="Password"  id="myInput" placeholder="пароль" name="password" required="">
+                                        </div>
+                                        <br/>
+
+                                        <div class="form-row bottom">
+                                            <div class="form-check">
+                                                <input type="checkbox" onclick="myFunction()">
+                                                <label> показать пароль</label>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-primary btn-block" type="submit">вход</button><br/>
+                                        <center><a class="mt-2" href="{{ url('login')}}">у вас уже ест? Войдите здесь</a></center>
+                                    </form>
+                                </div>
+
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+
     </div>
 
-
-
+                @include('blog/inc/errors');
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -238,3 +421,6 @@
 
 
 </div>
+</div>
+</div>
+
