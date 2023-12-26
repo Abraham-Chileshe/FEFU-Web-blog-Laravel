@@ -13,9 +13,7 @@
                         <localized-text key="home" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
+                
 
                 @if( auth()->check() )
                 <li class="nav-item dropdown">
