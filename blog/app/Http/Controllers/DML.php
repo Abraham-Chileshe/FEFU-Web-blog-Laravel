@@ -20,6 +20,14 @@ class DML extends Controller
         return redirect()->to('/');
     }
 
+    public function agree(){
+        $data=array('new_acc'=>0);
+        DB::table('users')->where('id', auth()->user()->id)->update($data);
+
+        return redirect()->to('/');
+       
+    }
+
     
   
 }
