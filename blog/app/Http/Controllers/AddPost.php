@@ -16,8 +16,22 @@ class AddPost extends Controller
         $title = $request->input('title');
         $desc= $request->input('description');
         $path = "";
-
         $file = $request->file('photo');
+
+        if($title == NuLL ){
+            $duplicateEmail_error = "Error. You need to add a Title";
+            return redirect('/')->withErrors(['error' => $duplicateEmail_error]);
+
+        }elseif($desc == NuLL ){
+            $duplicateEmail_error = "Error. You need to add a description";
+            return redirect('/')->withErrors(['error' => $duplicateEmail_error]);
+
+        }elseif($file == NuLL ){
+            $duplicateEmail_error = "Error. You need to add an image";
+            return redirect('/')->withErrors(['error' => $duplicateEmail_error]);
+        }
+
+       
         // Check if a file was uploaded
         if ($file) {
             // Ensure the 'uploads/students/' directory exists
