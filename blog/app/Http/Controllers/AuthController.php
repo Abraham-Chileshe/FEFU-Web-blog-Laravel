@@ -11,25 +11,38 @@ class AuthController extends Controller
     public function loginUser(Request $request)
     {
       
-            $login = $request->input('email');
-            $user = DB::table('users')->where('email', $login)->orWhere('username', $login)->first();
+            $email = $request->input('email');
+            $password = $request->input('pwd');
+
+
+        
+            $user = DB::table('users')
+            ->where('email', $email)
+            ->where('password', $password)
+            ->first();
          
         
-            if (!$user) {
-                //return redirect()->back()->withErrors(['email' => 'Invalid login credentials']);
+            if ($user === NULL) {
+                $duplicateEmail_error = "Failed to Login. Either your email or password is wrong";
+                return redirect('/')->withErrors(['error' => $duplicateEmail_error]);
+               
+            }else{
+
+                try {
+                 
+                    auth()->loginUsingId($user->id);
+                    return redirect()->to('/');
+        
+                } catch (\Illuminate\Database\QueryException $e) {
+                    return("Failed");
+                }
+              
+              
+               
+    
             }
         
-            $request->validate([
-                'password' => 'required|min:8',
-            ]);
-        
-            if (Auth::attempt(['email' => $user->email, 'password' => $request->password]) ||
-                Auth::attempt(['username' => $user->username, 'password' => $request->password])) {
-                Auth::loginUsingId($user->id);
-                //return redirect('/');
-            } else {
-                //return redirect()->back()->withErrors(['password' => 'Invalid login credentials']);
-            }
+           
     }
     
 
@@ -38,6 +51,6 @@ class AuthController extends Controller
 
     public function destroy() {
         auth()->logout();
-        return redirect()->to('/home');
+        return redirect()->to('/');
     } // Destroy the user session  // Redirect to the login page
 }
