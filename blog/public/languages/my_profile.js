@@ -1,7 +1,7 @@
 var dictionary = {
     "ru": { // when language is not supported
-        "logout": "Выход",
-        "home": "Главный",
+        "logout": "выход",
+        "home": "главный",
         "create": "создать новую запись",
         "joined" : "Cоздано",
         "VK": "ссылка на вк",
@@ -10,7 +10,13 @@ var dictionary = {
         "post_title": "заглавие",
         "post_desc" : "описание",
         "msg" : "добавить новый пост ",
-        "like" : "Лайк"
+        "like" : "Лайк",
+        "language": "язык",
+        "russian" : "Русский",
+        "english" : "Англиский",
+        "new_users" : "новые пользователи",
+        "you" : "Ты",
+        "blog" : "Блог"
 
     },
     "en": {
@@ -24,7 +30,13 @@ var dictionary = {
         "post_title": "Title",
         "post_desc" : "Description",
         "msg" : "Add New Post",
-        "like" : "Like"
+        "like" : "Like",
+        "language": "language",
+        "russian" : "Russian",
+        "english" : "English",
+        "new_users" : "NEW USERS",
+        "you": "You",
+        "blog": "Blog"
     }
 }
 
