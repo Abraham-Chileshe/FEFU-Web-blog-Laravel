@@ -27,7 +27,7 @@ class RegistrationController extends Controller
         $date = $join->toDateTimeString();
         
     
-        $password = bcrypt($password);
+       
     
         $data = array(
             'username' => $username,
