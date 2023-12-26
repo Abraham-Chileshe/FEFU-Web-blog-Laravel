@@ -33,6 +33,7 @@ Route::post('login', 'AuthController@loginUser');
 
 Route::get('logout','AuthController@destroy');
 Route::get('lang-update', 'DML@lang_update');
+Route::post('agreement', 'DML@agree');
 
 
 
