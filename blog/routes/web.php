@@ -16,20 +16,34 @@ Route::get('/', function () {
 });
 
 
+Route::get('/post', function () {
+    return view('blog.view_post');
+});
+
+
+
 
 //Registration
 Route::get('add-user', 'RegistrationController@store');
 Route::post('add-user','RegistrationController@store');
 
 
-Route::get('login-user', 'SessionsController@create');
-Route::post('login-user', 'SessionsController@store');
-Route::get('logout-user', 'SessionsController@destroy');
+Route::get('login', 'AuthController@loginUser');
+Route::post('login', 'AuthController@loginUser');
 
+Route::get('logout','AuthController@destroy');
 Route::get('lang-update', 'DML@lang_update');
+
 
 
 Route::get('add-post', 'AddPost@postinsert');
 Route::post('add-post','AddPost@postinsert');
 
-Route::get('home', 'AddPost@viewpost');
+Route::get('add-like', 'AddLike@Like');
+Route::post('add-like','AddLike@Like');
+
+Route::get('add-comment', 'AddComment@Comment');
+Route::post('add-comment','AddComment@Comment');
+
+
+
