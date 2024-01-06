@@ -44,7 +44,7 @@ $(window).on('load',function(){
             </p>
             <p>
             <div class="text-right">
-              <a href="#linktoseperatepage" class="btn btn-link"> I do not agree to Piracy policy</a>
+              
               <input type="Submit" id="continue-cp" value="Continue" class="btn btn-success push-right" disabled>
           </div>
         </form>
