@@ -8,7 +8,7 @@ var dictionary = {
         "dob": "д.рождения: ",
         "gender": "Пол :",
         "post_title": "заглавие",
-        "post_image": "gg",
+        "post_image": "изображение",
         "post_desc" : "описание",
         "msg" : "добавить новый пост ",
         "like" : "Лайк",
@@ -19,7 +19,11 @@ var dictionary = {
         "you" : "Ты",
         "blog" : "Блог",
         "p_create": "создать",
-        "p_close": "Закрыть"
+        "p_close": "Закрыть",
+        "news" : "последние новости",
+        "news_name": "Новости",
+        "blog_p" : "Посты"
+        
 
     },
     "en": {
@@ -42,7 +46,11 @@ var dictionary = {
         "you": "You",
         "blog": "Blog",
         "p_create": "Create",
-        "p_close": "Close"
+        "p_close": "Close",
+        "news" : "Latest News",
+        "news_name": "News",
+        "blog_p" : "Publication"
+        
     }
 }
 
