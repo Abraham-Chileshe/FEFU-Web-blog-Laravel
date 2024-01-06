@@ -37,10 +37,10 @@ $photos = DB::table('posts')
 @section('content')
 
     <!-- Header -->
-    @include('blog/inc/navbar');
+    @include('blog/inc/navbar')
     @if( auth()->check() )
         @if($agree->new_acc == 1)
-            @include('blog/inc/agreement');
+            @include('blog/inc/agreement')
         @endif
     @endif
    
@@ -56,64 +56,86 @@ $photos = DB::table('posts')
             <div class="col-md-3">
                 <!-- Accordion -->
                 <div id="accordion">
-                    <div class="card">
-                        <div class="card-header" id="headingOne">
-                            <h5 class="mb-0">
-                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    <localized-text key="new_users" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
-                
-                                </button>
-                            </h5>
-                        </div>
-                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
-                            <div class="card-body">
-                            
-
-                             
-                                @if( auth()->check() )
-                                    @php
-                                    $users = DB::table('users')
-                                    ->select('users.*')
-                                    ->where('id', '!=', auth()->user()->id)
-                                    ->orderBy('users.id', 'desc')
-                                    ->get();
-                                    @endphp
-                                @else
-                                    @php
-                                    $users = DB::table('users')
-                                    ->select('users.*')
-                                    ->orderBy('users.id', 'desc')
-                                    ->get();
-                                    @endphp
-                                @endif
-                            
-        
-                            @foreach ($users as $user_all)
-                                    <div>
-                                     <a href=""><i class="fa fa-user-circle mr-2" ></i> {{ $user_all->username  }}</a>
-                                        <hr />
-                                    </div>
-                            @endforeach
-                            </div>
-                        </div>
-                    </div>
-
+                    
                     <div class="card">
                         <div class="card-header" id="headingTwo">
                             <h5 class="mb-0">
                                 <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                                    Popular Posts
+                                    <localized-text key="news" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
                                 </button>
                             </h5>
                         </div>
                         <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordion">
-                            <div class="card-body">
-                                <!-- Your accordion item #1 content here -->
-                            </div>
+                           
+                                {{--News api section--}}
+                                <div id="news-container"></div>
+                                  {{--News api section--}}
+                     
                         </div>
                     </div>
                     <!-- Repeat the structure for additional accordion items -->
                 </div>
+
+
+
+               
+
+                <script>
+                  document.addEventListener('DOMContentLoaded', function () {
+                    const apiKey = 'fcbf5d6272d34629a4eb05e6ceda09dc'; // Replace with your News API key
+                    const newsContainer = document.getElementById('news-container');
+
+                    // Example: Fetch top headlines
+                    const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`;
+
+                    fetch(apiUrl)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.articles) {
+                                // Display news articles
+                                const firstFiveArticles = data.articles.slice(0, 3);
+
+
+                                firstFiveArticles.forEach(article =>  {
+                                    const articleElement = document.createElement('div');
+                                    articleElement.innerHTML = `
+                                    <div class="">
+                                    <div class="card">
+                                        <div class="card-header">
+                                        <img src="${article.urlToImage}" class="rounded" alt="rover" />
+                                        </div>
+                                        <div class="card-body">
+                                        <span class="tag tag-teal">${article.source.name}</span>
+                                        <h6 class="mt-2">
+                                            ${article.title}
+                                        </h6>
+                                        <p>
+                                            ${article.description}
+                                        </p>
+                                        <a href="${article.url}" style="font-size:14px; color:blue; " target="_blank">Read more</a>
+                                        <div class="user">
+                                             <div class="user-info">
+                                 
+                                            <small>${article.publishedAt}</small>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    </div>`;
+                                    newsContainer.appendChild(articleElement);
+                                });
+                            } else {
+                                console.error('Error fetching news:', data.message || 'Unknown error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching news:', error);
+                        });
+                });
+
+                </script>
 
                 
 
@@ -127,14 +149,14 @@ $photos = DB::table('posts')
                 <!-- Breadcrumb -->
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Category</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Current Page</li>
+                        <li class="breadcrumb-item"><a href="" id="news_section">  <localized-text key="news_name" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
+                        <li class="breadcrumb-item"><a href="" id="posts_section"><localized-text key="blog_p" lang="@php echo $lang @endphp"></localized-text></a></li></a></li>
+                       
                     </ol>
                 </nav>
 
 
-                <div class="scroll-container" >
+                <div id="post_area" class="scroll-container" >
                     @php
                         $posts = DB::table('posts')
                         ->join('users', 'posts.user_id', '=', 'users.id')
@@ -146,7 +168,7 @@ $photos = DB::table('posts')
 
                     @if ($posts->isEmpty()) 
                         <div class="container plates" style="margin-top:-em; max-width:700px">
-                        <h5 style="margin-top:4em; line-height:22px; font-family:Arial,Helvetica,sans-serif; padding:5em; color: grey; text-align: center;">Мероприятия не Посты</h5>
+                        <h5 style="margin-top:4em; line-height:22px; font-family:Arial,Helvetica,sans-serif; padding:5em; color: grey; text-align: center;">Посты не найдено</h5>
                         <h1 style="margin-top:-1em; color:white; background-color: rgba(146,0,0,0.5); text-align: center;" class="rounded"><i class="fa fa-exclamation-triangle" style="margin: 0 auto;"></i></h1><br/>
                         </div>
 
@@ -224,45 +246,77 @@ $photos = DB::table('posts')
                                     });
                                     </script>
                                     {{-- This update the like and Comment button very second--}}
-
-                                                                                                
-
-                                
-
-                            </div>
-                            
+                                </div>
                         </div>
                    
                         @endforeach
                         
                    
                 </div>
-                @include('blog/js_inc/scripts');
+
+                <div id="news_area" class="scroll-container" >
+                   
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                          const apiKey = 'fcbf5d6272d34629a4eb05e6ceda09dc'; // Replace with your News API key
+                          const newsContainer = document.getElementById('news_area');
+      
+                          // Example: Fetch top headlines
+                          const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`;
+      
+                          fetch(apiUrl)
+                              .then(response => response.json())
+                              .then(data => {
+                                  if (data.articles) {
+                                      // Display news articles
+                                      const firstFiveArticles = data.articles.slice(0, 25);
+      
+      
+                                      firstFiveArticles.forEach(article =>  {
+                                          const articleElement = document.createElement('div');
+                                          articleElement.innerHTML = `
+                                          <div class="mt-3 card main-card">
+                                            <div class="post">
+                                            <a href="${article.url}" style="text-transform: capitalize"> ${article.source.name}<span class="sr-only">(current)</span>
+                                                    </a>
+                                                <h6>Today: asd </h6>
+                                                <div class="fakeimg rounded" style="background-image: url('${article.urlToImage}'); background-size:cover; height:200px;"></div>
+                                                <h5 class="mt-4 mb-2"> ${article.title}</h5>
+
+                                                <p> ${article.description}
+                                                </p>
+
+                                                <a href="${article.url}" class="btn float-right read-btn" style="min-width:70px"><i class="mr-1 fa fa-eye"></i> Read More</a>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>`;
+                                          newsContainer.appendChild(articleElement);
+                                      });
+                                  } else {
+                                      console.error('Error fetching news:', data.message || 'Unknown error');
+                                  }
+                              })
+                              .catch(error => {
+                                  console.error('Error fetching news:', error);
+                              });
+                      });
+      
+                      </script>
+
+
+
+
+
+
+
+
+
+
+                </div>
+                @include('blog/js_inc/scripts')
             </div>
 
-            
-
-            
-
-
-        
-
-
-            <!--
-            <div class="col-md-3">
-
-              <div class="alert alert-success" role="alert">
-                This is a success alert!
-              </div>
-
-
-              <button type="button" class="btn btn-primary">Primary Button</button>
-
-             Cards
-              <div class="card mt-3">
-
-              </div>
-            </div>  -->
 
             <!-- Right Column -->
             <div class="col-md-3">
@@ -397,10 +451,80 @@ $photos = DB::table('posts')
                         </div>
                     </div>
                 </div>
+            </div>
+
+    
             @endif
+
+            
+            <div class="mt-3" id="accordion_users">
+                <div class="card">
+                    <div class="card-header" id="headingOne">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <localized-text key="new_users" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion_users">
+                        <div class="card-body">
+                        
+
+                         
+                            @if( auth()->check() )
+                                @php
+                                $users = DB::table('users')
+                                ->select('users.*')
+                                ->where('id', '!=', auth()->user()->id)
+                                ->orderBy('users.id', 'desc')
+                                ->get();
+                                @endphp
+                            @else
+                                @php
+                                $users = DB::table('users')
+                                ->select('users.*')
+                                ->orderBy('users.id', 'desc')
+                                ->get();
+                                @endphp
+                            @endif
+                        
+    
+                        @foreach ($users as $user_all)
+                                <div>
+                                 <a href=""><i class="fa fa-user-circle mr-2" ></i> {{ $user_all->username  }}</a>
+                                    <hr />
+                                </div>
+                        @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Repeat the structure for additional accordion items -->
+            </div>
+
+            
 
 
     </div>
+
+    <div class="wrapper">
+        <header>
+          <i class="fa fa-cookie-bite"></i>
+          <h2>Cookies Consent</h2>
+        </header>
+    
+        <div class="data">
+          <p>This website uses cookies to provide you with a more personalised and relevant browsing experience. <a
+              href="#"> Read More...</a></p>
+        </div>
+    
+        <div class="buttons">
+          <button class="button" id="acceptBtn">Accept</button>
+          <button class="button" id="declineBtn">Decline</button>
+        </div>
+      </div>
+      <script src="script.js"></script>
+      
 
                 @include('blog/inc/errors')
     <!-- Modal -->
