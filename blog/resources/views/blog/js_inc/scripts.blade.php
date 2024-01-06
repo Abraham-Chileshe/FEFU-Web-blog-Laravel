@@ -1,5 +1,22 @@
  <!-- Update the JavaScript code -->
  <script>
+    $('#post_area').hide();
+
+     $('#posts_section').click(function (event) {
+        event.preventDefault();
+        $('#news_area').fadeOut(1000);
+        $('#post_area').fadeIn(1000);
+       
+    });
+
+    $('#news_section').click(function (event) {
+        event.preventDefault();
+        $('#post_area').fadeOut(1000);
+        $('#news_area').fadeIn(1000);
+        
+    });
+
+
     $('.like-btn').click(function (event) {
         event.preventDefault();
         var postId = $(this).attr('id').split('_')[1]; // Extract post ID
