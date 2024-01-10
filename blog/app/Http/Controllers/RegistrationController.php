@@ -22,7 +22,6 @@ class RegistrationController extends Controller
         $password = $request->input('password');
         $vk = "https://vk.com/";
         $lang = "en";
-        $new = "1";
         $join = now();
         $date = $join->toDateTimeString();
         
@@ -38,7 +37,6 @@ class RegistrationController extends Controller
             'lang' => $lang,
             'vk' => $vk,
             'created_at' => $date,
-            'new_acc' => $new
         );
     
         try {
