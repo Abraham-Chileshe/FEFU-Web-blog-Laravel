@@ -21,7 +21,6 @@ class CreatePostsTable extends Migration
             $table->Text('description');
             $table->Timestamp('date');
 
-
         });
     }
 
