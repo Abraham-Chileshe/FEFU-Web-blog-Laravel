@@ -1,15 +1,12 @@
 @extends('blog.inc.layout')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous" ></script>
 
-
 @php
-
-$photos = DB::table('posts')
-        ->select('posts.*', 'posts.path as img_path')
-        ->orderBy('posts.id', 'desc')
-        ->get();
+    $photos = DB::table('posts')
+    ->select('posts.*', 'posts.path as img_path')
+    ->orderBy('posts.id', 'desc')
+    ->get();
 @endphp
-
 
 {{-- This sets the language of the page--}}
 @if( auth()->check() )
@@ -18,386 +15,359 @@ $photos = DB::table('posts')
     @endphp
 
     @php
-        $agree = DB::table('users')
-        ->select('users.*')
-        ->where('id', auth()->user()->id)
+        $admin = DB::table('admins')
+        ->select('admins.*')
+        ->where('user_id', auth()->user()->id)
         ->first();
-    @endphp
-     
-
+    @endphp  
 @else
     @php 
         $lang = "en";
     @endphp
-
 @endif
 {{-- This sets the language of the page--}}
 
-
 @section('content')
+@include('blog/inc/navbar')
 
-    <!-- Header -->
-    @include('blog/inc/navbar')
-    @if( auth()->check() )
-        @if($agree->new_acc == 1)
-            @include('blog/inc/agreement')
-        @endif
-    @endif
-   
-    <!-- Header -->
+<div class="container mt-4">
+    <div class="row">
+
+       
+
+        {{-- Left Column --}}
+        <div class="col-md-3 d-sm-none d-md-block d-none d-sm-block">
+            <div id="accordion">
+                <div class="card">
+                    <div class="card-header" id="headingTwo">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                <localized-text key="news" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
+                            </button>
+                        </h5>
+                    </div>
+                    <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordion">
+                        <div id="news-container"></div>
+                        <script src="{{ asset('js/news.js')}}"></script>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- Left Column --}}
+
+        {{-- Middle Column --}}
+        <div class="col-md-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="" id="news_section">  <localized-text key="news_name" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
+                    <li class="breadcrumb-item"><a href="" id="posts_section"><localized-text key="blog_p" lang="@php echo $lang @endphp"></localized-text></a></li></a></li>
+                </ol>
+            </nav>
+
+            <div class="d-none d-sm-block d-md-none d-block d-sm-none">
+            @if( auth()->check() )
+                <button type="button" class="w-100 btn btn-primary" data-toggle="modal" data-target="#post">
+                    <i class="fa fa-plus"></i>
+                    <localized-text key="create" lang="@php echo $lang @endphp"></localized-text>
+                </button>
+
+                <button type="button" class=" w-100 btn btn-dark" data-toggle="modal" data-target=".bd-example-modal-lg">
+                    <i class="fa fa-poll"></i>
+                    <localized-text key="survey" lang="@php echo $lang @endphp"></localized-text>
+                </button>
+
+            @endif
+            </div>
 
 
-    <!-- Main Content -->
-    <div class="container mt-4">
+            <div id="post_area" class="scroll-container" >
+                @php
+                    $posts = DB::table('posts')
+                    ->join('users', 'posts.user_id', '=', 'users.id')
+                    ->select('posts.*', 'users.username', 'users.id as uid','posts.id as pid')
+                    ->orderBy('posts.id', 'desc')
+                    ->get();
+                @endphp
 
-        <div class="row">
-
-            <!-- Left Column -->
-            <div class="col-md-3">
-                <!-- Accordion -->
-                <div id="accordion">
+                @if ($posts->isEmpty()) 
+                    <div class="container plates" style="margin-top:-em; max-width:700px">
+                        <h5 style="margin-top:4em; line-height:22px; font-family:Arial,Helvetica,sans-serif; padding:5em; color: grey; text-align: center;">Посты не найдено</h5>
+                        <h1 style="margin-top:-1em; color:white; background-color: rgba(146,0,0,0.5); text-align: center;" class="rounded"><i class="fa fa-exclamation-triangle" style="margin: 0 auto;"></i></h1><br/>
+                    </div>
+                @endif
                     
+                @foreach ($posts as $post)
+                    <div class="mt-3 card main-card">
+                        <div class="post">
+                            @if( auth()->check() )
+                                @if ($post->uid == auth()->user()->id)
+                                    <a href="" style="text-transform: capitalize"> <localized-text key="youpost" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span></a>
+                                @else
+                                    <a href="" style="text-transform: capitalize">{{$post->username}}<span class="sr-only">(current)</span></a>
+                                @endif
+                            @else
+                                <a href="" style="text-transform: capitalize">{{$post->username}}<span class="sr-only">(current)</span></a>    
+                            @endif
+
+                            <h6>Today: {{ $post->date}}</h6>
+                            <div class="fakeimg rounded" style="background-image: url('{{ $post->path}}'); background-size:cover; height:200px;">Image</div>
+                            <h5 class="mt-4 mb-2">{{ $post->title}}</h5>
+                            <p>{{ Illuminate\Support\Str::limit($post->description, 400) }}</p>
+
+                            @php
+                                $num_likes = DB::table('likes')->where('post_id', $post->pid)->count();
+                                $num_comments = DB::table('comments')->where('post_id', $post->pid)->count();
+                            @endphp
+
+                            @if( auth()->check() )
+                                {{--Like, coomment and read more button when logged in--}}
+                                <div class="form-group" >
+                                    <span class="update_like{{$post->pid}}">
+                                        <a href="#" class="btn like-btn" id="like_{{ $post->pid }}" style="min-width:50px"><i class="mr-1 fa fa-heart"></i> {{ $num_likes }}</a>
+                                        <a href="#" class="btn comment-btn"  id="comment_count_{{ $post->pid }}" style="min-width:50px"><i class="mr-1 fa fa-comment"></i>  {{ $num_comments }}</a>
+                                        
+                                        @if ($post->uid == auth()->user()->id)
+                                        <a href="{{url('delete')}}?postid={{ $post->pid}}" class="btn float-right delete-btn" style="min-width:70px; height: 40px"><i class="mr-1 fa fa-trash"></i></a>
+                                        @endif
+                                        <a href="{{url('/post')}}?postid={{ $post->pid}}" class="btn float-right read-btn" style="min-width:70px; height: 40px"><i class="mr-1 fa fa-eye"></i> View</a>
+                                        
+                                    </span><hr/>
+                                
+                                    <form method="post" class="comment_form" id="comment_{{ $post->pid }}">
+                                        <input type="text" class="form-control" placeholder="Comment" />
+                                        <input type="submit" class="btn btn-info mt-2" value="Comment" />
+                                        
+                                    </form>
+                                </div>
+                                {{--Like, coomment and read more button when logged in--}}
+                            @else
+                                {{--Like, coomment and read more button when NOT logged in--}}
+                                <div>
+                                    <a class="btn"  style="background-color: var(--blue-green); min-width:70px"><i class="ml-2 fa fa-heart"></i> {{ $num_likes }}</a>
+                                    <a class="btn"  style="background-color: var(--blue-green); min-width:70px"><i class="ml-2 fa fa-comment"></i> {{ $num_comments }}</a>
+                                    <a href="{{url('/post')}}?postid={{ $post->pid}}" class="btn float-right read-btn" style="min-width:70px"><i class="mr-1 fa fa-eye"></i> View</a>
+                                    
+                                </div>
+                                {{--Like, coomment and read more button when NOT logged in--}}
+                            @endif
+
+                            {{-- This update the like and Comment button very second--}}
+                            <script>
+                                $(document).ready(function () {
+                                    // Reload the div content every 5 seconds
+                                    setInterval(function () {
+                                        var update = $(this).attr('id')
+                                        // Replace '#yourDivId' with the actual ID of the div you want to reload
+                                        $('#'+update).load(location.href + '#'+update);
+
+                                    }, 1000); // 5000 milliseconds = 5 seconds
+                                });
+                            </script>
+                            {{-- This update the like and Comment button very second--}}
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div id="news_area" class="scroll-container" >
+                <script src="{{ asset('js/news-middle.js')}}"></script>
+                @include('blog/js_inc/scripts')
+            </div>
+           
+        </div>
+        {{-- Middle Column --}}
+
+        {{-- Right Column --}}
+        <div class="col-md-3 ">
+            <div id="carouselExampleControls" class="carousel slide d-sm-none d-md-block d-none d-sm-block" data-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg" class="d-block w-100" alt="Slide 1" style="height:220px;">
+                    </div>
+
+                    @foreach ($photos as $photo)
+                    <div class="carousel-item">
+                        <div class="fakeimg rounded" style="background-image: url('{{$photo->img_path}}'); background-size:fit; height:220px; border:5px dashed black"></div>
+                    </div>
+                    @endforeach  
+                </div>
+                <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+            <div class="d-sm-none d-md-block d-none d-sm-block">
+            @if( auth()->check() )
+                <button type="button" class="mt-3 w-100 btn btn-primary" data-toggle="modal" data-target="#post">
+                    <i class="fa fa-plus"></i>
+                    <localized-text key="create" lang="@php echo $lang @endphp"></localized-text>
+                </button>
+
+                @if ($admin) 
+                    @if( $admin->user_id != auth()->user()->id )
+                    <button type="button" class="mt-3 w-100 btn btn-dark" data-toggle="modal" data-target=".bd-example-modal-lg" >
+                        <i class="fa fa-poll"></i>
+                        <localized-text key="survey" lang="@php echo $lang @endphp"></localized-text>
+                    </button>
+                    @endif
+                
+                @else
+                    <button type="button" class="mt-3 w-100 btn btn-dark" data-toggle="modal" data-target=".bd-example-modal-lg">
+                        <i class="fa fa-poll"></i>
+                        <localized-text key="survey" lang="@php echo $lang @endphp"></localized-text>
+                    </button>
+                @endif
+                </div>
+
+                 {{-- Add Post--}}
+                <div class="modal fade" id="post" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"> <localized-text key="msg" lang="@php echo $lang @endphp"></localized-text></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form action="{{ url('add-post') }}" method="post" enctype="multipart/form-data">
+                                {{ csrf_field() }}
+                                    <div class="modal-body">
+
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label"> <localized-text key="post_title" lang="@php echo $lang @endphp"></localized-text></label>
+                                        <input type="text" class="form-control mr-sm-2" name="title">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="recipient-name" class="col-form-label"> <localized-text key="post_image" lang="@php echo $lang @endphp"></localized-text></label>
+                                        <input type="file" class="form-control" name="photo">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="message-text"  class="col-form-label"><localized-text key="post_desc" lang="@php echo $lang @endphp"></localized-text></label>
+                                        <textarea class="form-control" name="description"></textarea>
+                                    </div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"><localized-text key="p_close" lang="@php echo $lang @endphp"></localized-text></button>
+                                <button type="submit" class="btn btn-primary"><localized-text key="p_create" lang="@php echo $lang @endphp"></localized-text></button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                 {{-- Add Post--}}
+
+                    
+                {{-- New Users Accordion--}}
+                <div class="mt-3 d-sm-none d-md-block d-none d-sm-block" id="accordion_users">
                     <div class="card">
-                        <div class="card-header" id="headingTwo">
+                        <div class="card-header" id="headingOne">
                             <h5 class="mb-0">
-                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                                    <localized-text key="news" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    <localized-text key="new_users" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapseTwo" class="collapse show" aria-labelledby="headingTwo" data-parent="#accordion">
-                           
-                                {{--News api section--}}
-                                <div id="news-container"></div>
-                                  {{--News api section--}}
-                     
-                        </div>
-                    </div>
-                    <!-- Repeat the structure for additional accordion items -->
-                </div>
-
-
-
-               
-
-                <script>
-                  document.addEventListener('DOMContentLoaded', function () {
-                    const apiKey = 'fcbf5d6272d34629a4eb05e6ceda09dc'; // Replace with your News API key
-                    const newsContainer = document.getElementById('news-container');
-
-                    // Example: Fetch top headlines
-                    const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`;
-
-                    fetch(apiUrl)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.articles) {
-                                // Display news articles
-                                const firstFiveArticles = data.articles.slice(0, 3);
-
-
-                                firstFiveArticles.forEach(article =>  {
-                                    const articleElement = document.createElement('div');
-                                    articleElement.innerHTML = `
-                                    <div class="">
-                                    <div class="card">
-                                        <div class="card-header">
-                                        <img src="${article.urlToImage}" class="rounded" alt="rover" />
-                                        </div>
-                                        <div class="card-body">
-                                        <span class="tag tag-teal">${article.source.name}</span>
-                                        <h6 class="mt-2">
-                                            ${article.title}
-                                        </h6>
-                                        <p>
-                                            ${article.description}
-                                        </p>
-                                        <a href="${article.url}" style="font-size:14px; color:blue; " target="_blank">Read more</a>
-                                        <div class="user">
-                                             <div class="user-info">
-                                 
-                                            <small>${article.publishedAt}</small>
-                                            </div>
-                                        </div>
-                                        </div>
-                                    </div>
-                                    
-                                    
-                                    </div>`;
-                                    newsContainer.appendChild(articleElement);
-                                });
-                            } else {
-                                console.error('Error fetching news:', data.message || 'Unknown error');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error fetching news:', error);
-                        });
-                });
-
-                </script>
-
-                
-
-            </div>
-            <!-- Left Column -->
-
-
-            <!-- Scrollable Block -->
-            <div class="col-md-6">
-
-                <!-- Breadcrumb -->
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="" id="news_section">  <localized-text key="news_name" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
-                        <li class="breadcrumb-item"><a href="" id="posts_section"><localized-text key="blog_p" lang="@php echo $lang @endphp"></localized-text></a></li></a></li>
-                       
-                    </ol>
-                </nav>
-
-
-                <div id="post_area" class="scroll-container" >
-                    @php
-                        $posts = DB::table('posts')
-                        ->join('users', 'posts.user_id', '=', 'users.id')
-                        ->select('posts.*', 'users.username', 'users.id as uid','posts.id as pid')
-                        ->orderBy('posts.id', 'desc')
-                        ->get();
-                       
-                    @endphp
-
-                    @if ($posts->isEmpty()) 
-                        <div class="container plates" style="margin-top:-em; max-width:700px">
-                        <h5 style="margin-top:4em; line-height:22px; font-family:Arial,Helvetica,sans-serif; padding:5em; color: grey; text-align: center;">Посты не найдено</h5>
-                        <h1 style="margin-top:-1em; color:white; background-color: rgba(146,0,0,0.5); text-align: center;" class="rounded"><i class="fa fa-exclamation-triangle" style="margin: 0 auto;"></i></h1><br/>
-                        </div>
-
-                    @endif
-                        @foreach ($posts as $post)
-                   
-                        <div class="mt-3 card main-card">
-                            <a href="#" >
-                            <div class="post">
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion_users">
+                            <div class="card-body">
                                 @if( auth()->check() )
-                                    @if ($post->uid == auth()->user()->id)
-                                    <a href="" style="text-transform: capitalize"> <localized-text key="you" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
-                                    </a>
-                                    @else
-                                    <a href="" style="text-transform: capitalize">{{$post->username}}<span class="sr-only">(current)</span>
-                                    </a>
-                              
-                                    @endif
+                                    @php
+                                    $users = DB::table('users')
+                                    ->select('users.*')
+                                    ->where('id', '!=', auth()->user()->id)
+                                    ->orderBy('users.id', 'desc')
+                                    ->get();
+                                    @endphp
                                 @else
-                                    <a href="" style="text-transform: capitalize">{{$post->username}}<span class="sr-only">(current)</span>
-                                    </a>
-                              
+                                    @php
+                                    $users = DB::table('users')
+                                    ->select('users.*')
+                                    ->orderBy('users.id', 'desc')
+                                    ->get();
+                                    @endphp
                                 @endif
-
-                                <h6>Today: {{ $post->date}} </h6>
-                                <div class="fakeimg rounded" style="background-image: url('{{ $post->path}}'); background-size:cover; height:200px;">Image</div>
-                                <h5 class="mt-4 mb-2">{{ $post->title}}</h5>
-
-                                <p>{{ Illuminate\Support\Str::limit($post->description, 400) }}
-                                </p>
-
-                                @php
-                                    $num_likes = DB::table('likes')->where('post_id', $post->pid)->count();
-                                    $num_comments = DB::table('comments')->where('post_id', $post->pid)->count();
-                                @endphp
-
-                                @if( auth()->check() )
-                                    {{--Like, coomment and read more button when logged in--}}
-                                    <div class="form-group" >
-                                        <span class="update_like{{$post->pid}}">
-                                            <a href="#" class="btn like-btn" id="like_{{ $post->pid }}" style="min-width:70px"><i class="mr-1 fa fa-heart"></i> {{ $num_likes }}</a>
-                                            <a href="#" class="btn comment-btn"  id="comment_count_{{ $post->pid }}" style="min-width:70px"><i class="mr-1 fa fa-comment"></i>  {{ $num_comments }}</a>
-                                            <a href="{{url('/post')}}?postid={{ $post->pid}}" class="btn float-right read-btn" style="min-width:70px"><i class="mr-1 fa fa-eye"></i> Read More</a>
-                                        </span><hr/>
-                                    
-                                        <form method="post" class="comment_form" id="comment_{{ $post->pid }}">
-                                            <input type="text" class="form-control" placeholder="Comment" />
-                                            <input type="submit" class="btn btn-info mt-2" value="submit" />
-                                        </form>
-                                    </div>
-                                    {{--Like, coomment and read more button when logged in--}}
                                 
-                                @else
-                                    {{--Like, coomment and read more button when NOT logged in--}}
+                                @foreach ($users as $user_all)
                                     <div>
-                                        <a class="btn"  style="background-color: var(--blue-green); min-width:70px"><i class="ml-2 fa fa-heart"></i> {{ $num_likes }}</a>
-                                        <a class="btn"  style="background-color: var(--blue-green); min-width:70px"><i class="ml-2 fa fa-comment"></i> {{ $num_comments }}</a>
-                                        <a href="{{url('/post')}}?postid={{ $post->pid}}" class="btn float-right read-btn" style="min-width:70px"><i class="mr-1 fa fa-eye"></i> Read More</a>
+                                        <a href=""><i class="fa fa-user-circle mr-2" ></i> {{ $user_all->username  }} </a>
+                                        <hr />
                                     </div>
-                                     {{--Like, coomment and read more button when NOT logged in--}}
-
-                                @endif
-
-
-                                {{-- This update the like and Comment button very second--}}
-                                <script>
-                                    $(document).ready(function () {
-                                        // Reload the div content every 5 seconds
-                                        setInterval(function () {
-                                            var update = $(this).attr('id')
-                                            // Replace '#yourDivId' with the actual ID of the div you want to reload
-                                            $('#'+update).load(location.href + '#'+update);
-
-                                        }, 1000); // 5000 milliseconds = 5 seconds
-                                    });
-                                    </script>
-                                    {{-- This update the like and Comment button very second--}}
-                                </div>
+                                @endforeach
+                            </div>
                         </div>
-                   
-                        @endforeach
-                        
-                   
-                </div>
-
-                <div id="news_area" class="scroll-container" >
-                   
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                          const apiKey = 'fcbf5d6272d34629a4eb05e6ceda09dc'; // Replace with your News API key
-                          const newsContainer = document.getElementById('news_area');
-      
-                          // Example: Fetch top headlines
-                          const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&apiKey=${apiKey}`;
-      
-                          fetch(apiUrl)
-                              .then(response => response.json())
-                              .then(data => {
-                                  if (data.articles) {
-                                      // Display news articles
-                                      const firstFiveArticles = data.articles.slice(0, 25);
-      
-      
-                                      firstFiveArticles.forEach(article =>  {
-                                          const articleElement = document.createElement('div');
-                                          articleElement.innerHTML = `
-                                          <div class="mt-3 card main-card">
-                                            <div class="post">
-                                            <a href="${article.url}" style="text-transform: capitalize"> ${article.source.name}<span class="sr-only">(current)</span>
-                                                    </a>
-                                                <h6>Today: asd </h6>
-                                                <div class="fakeimg rounded" style="background-image: url('${article.urlToImage}'); background-size:cover; height:200px;"></div>
-                                                <h5 class="mt-4 mb-2"> ${article.title}</h5>
-
-                                                <p> ${article.description}
-                                                </p>
-
-                                                <a href="${article.url}" class="btn float-right read-btn" style="min-width:70px"><i class="mr-1 fa fa-eye"></i> Read More</a>
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>`;
-                                          newsContainer.appendChild(articleElement);
-                                      });
-                                  } else {
-                                      console.error('Error fetching news:', data.message || 'Unknown error');
-                                  }
-                              })
-                              .catch(error => {
-                                  console.error('Error fetching news:', error);
-                              });
-                      });
-      
-                      </script>
-
-
-
-
-
-
-
-
-
-
-                </div>
-                @include('blog/js_inc/scripts')
-            </div>
-
-
-            <!-- Right Column -->
-            <div class="col-md-3">
-                <!-- Carousel -->
-                <!-- Carousel -->
-                <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg" class="d-block w-100" alt="Slide 1" style="height:220px;">
-
-                        </div>
-
-                        @foreach ($photos as $photo)
-                        <div class="carousel-item">
-                            <div class="fakeimg rounded" style="background-image: url('{{$photo->img_path}}'); background-size:cover; height:220px; border:5px dashed black"></div>
-                        </div>
-                        @endforeach
-                        
-                    </div>
-                    <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </div>
-
-
-                
-            @if( auth()->check() )
-
-            <button type="button" class="mt-3 w-100 btn btn-primary" data-toggle="modal" data-target="#post">
-                <i class="fa fa-plus"></i>
-                <localized-text key="create" lang="@php echo $lang @endphp"></localized-text>
-            </button>
-
-            <div class="modal fade" id="post" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel"> <localized-text key="msg" lang="@php echo $lang @endphp"></localized-text></h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form action="{{ url('add-post') }}" method="post" enctype="multipart/form-data">
-                            {{ csrf_field() }}
-                                <div class="modal-body">
-
-                                <div class="form-group">
-                                    <label for="recipient-name" class="col-form-label"> <localized-text key="post_title" lang="@php echo $lang @endphp"></localized-text></label>
-                                    <input type="text" class="form-control mr-sm-2" name="title">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="recipient-name" class="col-form-label"> <localized-text key="post_image" lang="@php echo $lang @endphp"></localized-text></label>
-                                    <input type="file" class="form-control" name="photo">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="message-text"  class="col-form-label"><localized-text key="post_desc" lang="@php echo $lang @endphp"></localized-text></label>
-                                    <textarea class="form-control" name="description"></textarea>
-                                </div>
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal"><localized-text key="p_close" lang="@php echo $lang @endphp"></localized-text></button>
-                            <button type="submit" class="btn btn-primary"><localized-text key="p_create" lang="@php echo $lang @endphp"></localized-text></button>
-                        </div>
-                        </form>
                     </div>
                 </div>
-            </div>
+                {{-- New Users Accordion--}}
+
+                {{-- Survey Dialog BOx --}}
+                <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="survey-container">
+                                <div class="survey-headr">
+                                <h1 id="survey-title"><localized-text key="form" lang="@php echo $lang @endphp"></localized-text></h1>
+                                <p id="survey-description">{{ auth()->user()->username}}, Answer these questions</p>
+                                </div>
+
+                                <form action="{{ url('add-survey')}}" method="post" id="survey-form">
+                                {{ csrf_field() }}
+                                <fieldset class="survey-fieldset container">
+                                    <legend class="survey-legend"><localized-text key="you" lang="@php echo $lang @endphp"></localized-text></legend>
+                                    <label class="survey-label" id="survey-name-label"><localized-text key="name" lang="@php echo $lang @endphp"></localized-text><input class="input" type="text" id="survey-name" name="name" placeholder="Fullname" value="{{ auth()->user()->username}}" required></label>
+                                    <label class="survey-label" id="survey-email-label"><localized-text key="email" lang="@php echo $lang @endphp"></localized-text><input class="input" type="email" id="survey-email" name="email" placeholder="Email" value="{{ auth()->user()->email}}" required></label>
+                                    <label class="survey-label" id="survey-number-label"><localized-text key="age" lang="@php echo $lang @endphp"></localized-text> <input class="input" type="number" id="survey-number" name="age" placeholder="00" min="0" max="500" required></label>
+                                
+                                    <label class="survey-label"><localized-text key="country" lang="@php echo $lang @endphp"></localized-text>
+                                        <select name="country" class="input" id="survey-dropdown">
+                                        @include('blog/inc/countries');
+                                        </select>
+                                    </label><br/>
 
 
+                                    </fieldset>
+                                <fieldset class="survey-fieldset container">
+                                    <legend class="survey-legend"><localized-text key="rate" lang="@php echo $lang @endphp"></localized-text></legend>
+                                    <label class="survey-label"><localized-text key="rating" lang="@php echo $lang @endphp"></localized-text>
+                                    <select name="rating" class="input" id="survey-dropdown">
+                                        <option value="Bad">Bad</option>
+                                        <option value="good" selected>Good</option>
+                                        <option value="exellent">Excellent</option>
+                                    
+                                    </select>
+                                    </label><br/>
+                                    <legend class="survey-legend"><localized-text key="visit" lang="@php echo $lang @endphp"></localized-text></legend>
+                                    <label class="survey-label"><input type="radio" name="check" value="Rarely" checked><localized-text key="rarely" lang="@php echo $lang @endphp"></localized-text></label>
+                                    <label class="survey-label"><input type="radio" name="check" value="Sometimes"><localized-text key="sometimes" lang="@php echo $lang @endphp"></localized-text></label>
+                                    <label class="survey-label"><input type="radio" name="check" value="Always"><localized-text key="always" lang="@php echo $lang @endphp"></localized-text></label>
+                                </fieldset>
+                                <fieldset class="survey-fieldset container">
+                                    <legend class="survey-legend"><localized-text key="interest" lang="@php echo $lang @endphp"></localized-text></legend>
+                                    <label class="survey-label"><input type="checkbox" name="news" value="News"><localized-text key="news" lang="@php echo $lang @endphp"></localized-text></label>
+                                    <label class="survey-label"><input type="checkbox" name="posts" value="Posts"><localized-text key="posts" lang="@php echo $lang @endphp"></localized-text></label>
+                                    <label class="survey-label"><input type="checkbox" name="design" value="design"><localized-text key="design" lang="@php echo $lang @endphp"></localized-text></label>
+                                </fieldset>
+                                <fieldset class="survey-fieldset container">
+                                    <legend class="survey-legend"><localized-text key="say_something" lang="@php echo $lang @endphp"></localized-text></legend>
+                                    <textarea name="additional-comments" id="survey-additional-comments" class="survey-textarea" cols="30" rows="10"></textarea>
+                                </fieldset>
+                                <input type="submit" id="survey-submit" value="Submit">
+                                <a href="btn btn-danger">close</a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{-- Survey Dialog BOx --}}
             @else
+                {{-- Registration Button and Form--}}
                 <button type="button" class="btn register_btn" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Registration</button>
-
                 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -420,7 +390,7 @@ $photos = DB::table('posts')
                                         </div>
 
                                         <div class="input-group">
-                                           
+                                            
                                             <select name="gender" class="mt-3 form-control">
                                                 <option value="Male">Male</option>
                                                 <option value="Female">Female</option>
@@ -451,83 +421,18 @@ $photos = DB::table('posts')
                         </div>
                     </div>
                 </div>
-            </div>
-
-    
+                {{-- Registration Button and Form--}}
             @endif
 
-            
-            <div class="mt-3" id="accordion_users">
-                <div class="card">
-                    <div class="card-header" id="headingOne">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                <localized-text key="new_users" lang="@php echo $lang @endphp"></localized-text> <span class="sr-only">(current)</span>
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion_users">
-                        <div class="card-body">
-                        
-
-                         
-                            @if( auth()->check() )
-                                @php
-                                $users = DB::table('users')
-                                ->select('users.*')
-                                ->where('id', '!=', auth()->user()->id)
-                                ->orderBy('users.id', 'desc')
-                                ->get();
-                                @endphp
-                            @else
-                                @php
-                                $users = DB::table('users')
-                                ->select('users.*')
-                                ->orderBy('users.id', 'desc')
-                                ->get();
-                                @endphp
-                            @endif
-                        
-    
-                        @foreach ($users as $user_all)
-                                <div>
-                                 <a href=""><i class="fa fa-user-circle mr-2" ></i> {{ $user_all->username  }}</a>
-                                    <hr />
-                                </div>
-                        @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Repeat the structure for additional accordion items -->
-            </div>
-
-            
-
-
+        </div>
+        {{-- Right Column --}}
+        
+       
     </div>
+    </div>
+</div>
 
-    <div class="wrapper">
-        <header>
-          <i class="fa fa-cookie-bite"></i>
-          <h2>Cookies Consent</h2>
-        </header>
-    
-        <div class="data">
-          <p>This website uses cookies to provide you with a more personalised and relevant browsing experience. <a
-              href="#"> Read More...</a></p>
-        </div>
-    
-        <div class="buttons">
-          <button class="button" id="acceptBtn">Accept</button>
-          <button class="button" id="declineBtn">Decline</button>
-        </div>
-      </div>
-      <script src="script.js"></script>
-      
-
-                @include('blog/inc/errors')
-    <!-- Modal -->
+    @include('blog/inc/errors')
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -548,8 +453,8 @@ $photos = DB::table('posts')
         </div>
     </div>
 
+</div>
 
-</div>
-</div>
-</div>
+<script src="{{ asset('js/cookie.js')}}"></script>
+
 
