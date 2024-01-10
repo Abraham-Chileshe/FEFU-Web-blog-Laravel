@@ -70,18 +70,25 @@ body{
     border:4px dashed var(--green);
 }
 .like-btn{
-    background-color:rgba(255, 0, 0, 0.295);;
+    color:rgba(255, 0, 0, 0.938);;
     border-radius:10px;
 }
 
 .comment-btn{
-    background-color:rgba(14, 216, 41, 0.329);;
+
     border-radius:10px;
 }
 
 .read-btn{
-    background-color:rgba(30, 31, 30, 0.329);;
-    border-radius:10px;
+    background-color:rgba(30, 31, 30, 0.329);
+    
+}
+
+.delete-btn{
+  margin-top:3px;
+  color:rgba(255, 0, 0, 0.719);
+
+  
 }
 
 
@@ -295,4 +302,151 @@ button:active {
   .user-info small {
     color: #545d7a;
   }
+  
+
+  
+  /*########## SURVEY #############*/
+  #survey-title {
+    font-family: "Rubik", sans-serif;
+    text-align: center;
+    padding: 1.5rem 0;
+    margin: 0;
+    padding-bottom: 0.2rem;
+  }
+  
+  #survey-description {
+    text-align: center;
+    border-bottom: 1px solid silver;
+    margin-top: 0;
+    padding-bottom: 1.5rem;
+    font-family: "Rubik", sans-serif;
+  }
+  
+  #survey-form {
+    margin: 10px;
+  }
+  
+  .survey-fieldset:not(:last-of-type) {
+    margin-bottom: 1rem;
+  }
+  
+  .survey-legend {
+    font-size: 18px;
+    font-weight:bold;
+    font-family: "Roboto", sans-serif;
+  }
+  
+  .survey-label {
+
+    font-size: 0.9rem;
+    display: grid;
+    grid-template-columns: 10% auto;
+    gap: 0.1em;
+    max-width:100%;
+    padding: 5px;
+    align-items: center;
+  }
+.input{
+    border:none;
+    border-bottom:1px solid grey;
+  }
+  
+  .survey-label:hover,
+  .survey-label:focus-within {
+    background-color: #eee;
+
+  }
+  .survey-radio {
+  }
+  
+  #survey-submit {
+    display: block;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    margin: 0.5rem auto;
+    font-size: 16px;
+    min-width: 60px;
+    width: 20%;
+    padding: 15px 15px;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  #survey-submit:hover {
+    background-color: #45AA4A;
+  }
+  
+  .survey-textarea {
+    width: 100%;
+    max-width: 100%;
+    overflow: scroll;
+    resize: vertical;
+    height: 5rem;
+  }
+
+  
+
+
+
+  /*######## COOKIE #######*/
+  #okCookie{
+    background-color:#F2F2F2;
+    color:#333333;
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    padding:10px;
+    font-family:sans-serif;
+    -moz-box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    box-sizing: border-box;
+    border-top:1px solid #ccc;
+    z-index:10;
+  }
+  
+  #okCookie p{margin:0 0 10px 0; float:left; padding:5px 0px;}
+  
+  #okCookie #okClose, #okCookie #okCprivacy{
+    padding:5px 20px;
+    float:right;
+    margin-left:10px;
+    text-decoration:none;
+    border-radius:3px;
+    color:white;
+  }
+  
+  #okCookie #okClose{
+    background-color:#39B54A;
+    text-shadow:0px 1px 1px #507F2B;
+    box-shadow:inset 0px -1px 1px #507F2B;
+  }
+  
+  #okCookie #okClose:hover{background-color:#42ce55}
+  
+  #okCookie #okCprivacy{
+    background-color:#8D9499;
+    text-shadow:0px 1px 1px #63666B;
+    box-shadow:inset 0px -1px 1px #63666B;
+  }
+  
+  #okCookie #okCprivacy:hover{background-color:#a0a8ae}
+  
+  .okcBeginAnimate{
+      -webkit-animation: myfirst 2s; 
+      animation: myfirst 2s;
+  }
+  
+  /* Chrome, Safari, Opera */
+  @-webkit-keyframes myfirst {
+      from {opacity: 0;}
+      to {opacity: 1;}
+  }
+  
+  /* Standard syntax */
+  @keyframes myfirst {
+      from {opacity: 0;}
+      to {opacity: 1;}
+  } 
   
