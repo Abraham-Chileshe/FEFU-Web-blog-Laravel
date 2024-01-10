@@ -1,6 +1,6 @@
  <!-- Update the JavaScript code -->
  <script>
-    $('#post_area').hide();
+    $('#news_area').hide();
 
      $('#posts_section').click(function (event) {
         event.preventDefault();
