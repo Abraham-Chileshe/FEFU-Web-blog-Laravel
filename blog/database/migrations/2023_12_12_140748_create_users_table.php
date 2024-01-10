@@ -22,7 +22,6 @@ class CreateUsersTable extends Migration
             $table->string('vk');
             $table->string('lang');
             $table->Timestamp('created_at');
-            $table->string('new_acc');
             $table->string('password');
             
         });
