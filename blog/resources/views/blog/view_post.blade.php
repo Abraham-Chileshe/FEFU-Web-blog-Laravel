@@ -20,7 +20,17 @@ $posts = DB::table('posts')
         ->where('posts.id', $pid)
         ->orderBy('posts.id', 'desc')
         ->get();
+
 @endphp
+
+@if( auth()->check() )
+    @php
+        $admin = DB::table('admins')
+        ->select('admins.*')
+        ->where('user_id', auth()->user()->id)
+        ->first();
+    @endphp
+@endif
 
 @if (!$pid)
     
@@ -35,7 +45,7 @@ $posts = DB::table('posts')
 
 @else
     @php 
-        $lang = "en";
+        $lang = "en"
     @endphp
 
 @endif
@@ -45,7 +55,7 @@ $posts = DB::table('posts')
 @section('content')
 
     <!-- Header -->
-    @include('blog/inc/navbar');
+    @include('blog/inc/navbar')
     <!-- Header -->
 
 
@@ -227,7 +237,7 @@ $posts = DB::table('posts')
 
 
 
-     @include('blog/js_inc/scripts');
+     @include('blog/js_inc/scripts')
   
 
      
