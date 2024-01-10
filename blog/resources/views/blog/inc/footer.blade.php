@@ -1,6 +1,6 @@
 <!-- Footer -->
 <footer class="bg-dark text-light text-center py-3 mt-4" style="min-height:100hv">
-    <p>&copy; 2023 Your Website</p>
+    <p>&copy; {{ now()->year }} <localized-text key="blog" lang="@php echo $lang @endphp"></localized-text></p>
 </footer>
 
 <!-- Bootstrap Scripts -->
